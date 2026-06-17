@@ -10,6 +10,7 @@ PROMETHEUS_VERSION="3.5.0"
 # Replace with your actual private IPs
 MONITORING_SERVER="10.0.134.152:9100"
 APP_SERVER_1="10.0.133.214:9100"
+APP_SERVER_2="10.0.133.215:9100"
 
 ############################################
 # CREATE USER
@@ -135,3 +136,4 @@ echo ""
 echo "Configured targets:"
 echo "${MONITORING_SERVER}"
 echo "${APP_SERVER_1}"
+echo "${APP_SERVER_2}"

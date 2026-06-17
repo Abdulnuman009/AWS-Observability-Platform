@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException
+import logging
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import (
     create_engine,
     Column,
@@ -10,8 +12,17 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
+from prometheus_fastapi_instrumentator import Instrumentator
 
 load_dotenv()
+
+logging.basicConfig(
+    filename="/var/log/fastapi/app.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
@@ -87,6 +98,16 @@ app = FastAPI(
     title="AWS Observability Demo API"
 )
 
+Instrumentator().instrument(app).expose(app)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # testing only
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # -----------------------------
 # Startup Event
 # -----------------------------
@@ -96,8 +117,8 @@ def startup():
 
     Base.metadata.create_all(bind=engine)
 
-    print("Database initialized")
-    print("Users table created")
+    logger.info("Database initialized")
+    logger.info("Users table created")
 
 
 # -----------------------------
@@ -119,6 +140,7 @@ def root():
 
 @app.post("/users")
 def create_user(user: dict):
+    logger.info(f"Creating user: {user['email']}")
 
     db = SessionLocal()
 
@@ -152,6 +174,7 @@ def create_user(user: dict):
 
 @app.get("/users")
 def get_users():
+    logger.info("Fetching all users")
 
     db = SessionLocal()
 
@@ -202,6 +225,8 @@ def update_user(
     payload: dict
 ):
 
+    logger.info(f"Updating user: {user_id}")
+
     db = SessionLocal()
 
     try:
@@ -235,6 +260,7 @@ def update_user(
 
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int):
+    logger.info(f"Deleting user: {user_id}")
 
     db = SessionLocal()
 

@@ -1,0 +1,29 @@
+{
+  "Name": "observability-log-export-daily",
+  "Description": "Triggers the CloudWatch Logs → S3 export Lambda every day at 02:00 UTC. Runs after midnight to ensure the previous day's log streams are fully flushed before export.",
+  "ScheduleExpression": "cron(0 2 * * ? *)",
+  "State": "ENABLED",
+  "Targets": [
+    {
+      "Id": "export-cloudwatch-logs-lambda",
+      "Arn": "<LAMBDA_FUNCTION_ARN>",
+      "Input": "{}"
+    }
+  ],
+  "Notes": {
+    "setup": [
+      "1. Deploy the Lambda function (logging/lambda-export-logs.py)",
+      "2. Set Lambda environment variables: LOG_GROUP_NAME and S3_BUCKET_NAME",
+      "3. Replace <LAMBDA_FUNCTION_ARN> above with the deployed function ARN",
+      "4. Create this EventBridge rule via AWS Console or CLI:",
+      "   aws events put-rule --cli-input-json file://eventbridge-rule.json",
+      "5. Add Lambda resource-based policy to allow EventBridge invocation:",
+      "   aws lambda add-permission \\",
+      "     --function-name export-cloudwatch-logs \\",
+      "     --statement-id allow-eventbridge \\",
+      "     --action lambda:InvokeFunction \\",
+      "     --principal events.amazonaws.com \\",
+      "     --source-arn <EVENTBRIDGE_RULE_ARN>"
+    ]
+  }
+}

@@ -1,1 +1,84 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual Environments
+venv/
+myvenv/
 .env
+.env.*
+*.env
+
+# Python Cache
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# =========================
+# FastAPI / Logs
+# =========================
+*.log
+logs/
+*.sqlite3
+
+# =========================
+# VS Code / IDE
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# React
+# =========================
+node_modules/
+build/
+dist/
+
+# React Environment Files
+frontend/.env
+frontend/.env.*
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Terraform (Future)
+# =========================
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+# =========================
+# AWS Credentials
+# =========================
+.aws/
+credentials
+config
+
+# =========================
+# Prometheus / Grafana Runtime Data
+# =========================
+prometheus-data/
+grafana-data/
+loki-data/
+tempo-data/
+
+# =========================
+# Certificates / Secrets
+# =========================
+*.pem
+*.key
+*.crt
+secrets/
