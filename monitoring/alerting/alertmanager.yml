@@ -1,0 +1,54 @@
+# Alertmanager configuration
+# Routes critical alerts immediately to PagerDuty.
+# Warning-severity alerts are grouped and sent to PagerDuty with a 5-minute delay.
+
+global:
+  resolve_timeout: 5m
+  pagerduty_url: "https://events.pagerduty.com/v2/enqueue"
+
+route:
+  group_by: ["alertname", "severity"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: "pagerduty-warning"
+
+  routes:
+    - match:
+        severity: critical
+      receiver: "pagerduty-critical"
+      group_wait: 10s
+      repeat_interval: 1h
+
+    - match:
+        severity: warning
+      receiver: "pagerduty-warning"
+
+receivers:
+  - name: "pagerduty-critical"
+    pagerduty_configs:
+      - routing_key: "<PAGERDUTY_INTEGRATION_KEY_CRITICAL>"
+        severity: critical
+        description: "{{ .CommonAnnotations.summary }}"
+        details:
+          firing: "{{ .Alerts.Firing | len }}"
+          instance: "{{ .CommonLabels.instance }}"
+          job: "{{ .CommonLabels.job }}"
+
+  - name: "pagerduty-warning"
+    pagerduty_configs:
+      - routing_key: "<PAGERDUTY_INTEGRATION_KEY_WARNING>"
+        severity: warning
+        description: "{{ .CommonAnnotations.summary }}"
+        details:
+          firing: "{{ .Alerts.Firing | len }}"
+          instance: "{{ .CommonLabels.instance }}"
+
+inhibit_rules:
+  # Suppress warning alerts when a critical alert is already firing
+  # for the same instance — avoids duplicate noise during incidents
+  - source_match:
+      severity: critical
+    target_match:
+      severity: warning
+    equal: ["alertname", "instance"]

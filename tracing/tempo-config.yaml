@@ -1,0 +1,50 @@
+# Grafana Tempo configuration
+# Deployed on the Monitoring EC2 alongside Prometheus and Grafana.
+# Receives traces from FastAPI via OTLP gRPC on port 4317.
+# Stores trace data on local disk; Grafana queries it via the Tempo data source.
+
+server:
+  http_listen_port: 3200
+  log_level: info
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317      # FastAPI OTel exporter sends here
+        http:
+          endpoint: 0.0.0.0:4318      # Alternative HTTP/JSON endpoint
+
+ingester:
+  max_block_duration: 5m
+
+compactor:
+  compaction:
+    block_retention: 720h             # Keep traces for 30 days
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /var/lib/tempo/traces
+    wal:
+      path: /var/lib/tempo/wal
+
+# Enable TraceQL search — allows querying like:
+#   { .http.method = "POST" && duration > 500ms }
+search_enabled: true
+
+# Metrics generator: derives RED metrics (Rate, Errors, Duration)
+# from incoming trace spans and exposes them as Prometheus metrics.
+# This enables a single Grafana dashboard that correlates metrics + traces.
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
+      cluster: observability-platform
+  storage:
+    path: /var/lib/tempo/generator/wal
+  processors:
+    - service-graphs
+    - span-metrics

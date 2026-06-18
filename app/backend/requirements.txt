@@ -3,3 +3,8 @@ uvicorn
 sqlalchemy
 pymysql
 python-dotenv
+opentelemetry-sdk
+opentelemetry-api
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-sqlalchemy
+opentelemetry-exporter-otlp-proto-grpc

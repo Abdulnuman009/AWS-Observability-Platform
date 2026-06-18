@@ -13,6 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
 from prometheus_fastapi_instrumentator import Instrumentator
+from otel_config import configure_tracing
 
 load_dotenv()
 
@@ -107,6 +108,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+configure_tracing(app, engine=engine)
 
 # -----------------------------
 # Startup Event
