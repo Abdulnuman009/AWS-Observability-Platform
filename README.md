@@ -134,7 +134,7 @@ Prometheus scrapes three targets every 15 seconds:
 Grafana dashboards visualise:
 
 1. **Infrastructure dashboard** — Node Exporter Full (Grafana dashboard ID 1860)
-2. **Application dashboard** — FastAPI HTTP metrics (request rate, p50/p95/p99 latency, error rate)
+2. **Application dashboard** — FastAPI HTTP metrics (request rate, error rate)
 
 ---
 
